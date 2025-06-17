@@ -84,3 +84,8 @@ class MainApp extends StatelessWidget {
     );
   }
 }
+
+// Nama Lengkap = Anna Maulina
+// NIM = 230441100178
+// Kelas = PEMBER C
+// Nama Asprak = Dhea Rahma Dianti
