@@ -15,16 +15,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   final _titleController = TextEditingController();
   final _deadlineController = TextEditingController();
 
-  String _selectedCategory = 'Organisasi';
+  String? _selectedCategory;
   DateTime? _selectedDate;
   final List<String> _categories = ['Organisasi', 'Kuliah', 'Pribadi', 'Lainnya'];
 
   @override
   void initState() {
     super.initState();
-    _titleController.text = "Rapat Akbar";
-    _selectedDate = DateTime(2025, 6, 2);
-    _deadlineController.text = DateFormat('d MMMM yyyy', 'id_ID').format(_selectedDate!);
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -44,9 +41,15 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
+      if (_selectedCategory == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Silakan pilih kategori terlebih dahulu')),
+        );
+        return;
+      }
       final newTask = Task(
         title: _titleController.text,
-        category: _selectedCategory,
+        category: _selectedCategory!, 
         deadline: _selectedDate!,
       );
       TaskService.addTask(newTask).then((_) {
@@ -117,6 +120,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   filled: true,
                   fillColor: tealColor,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  hintText: 'Contoh: Mengerjakan Laporan Praktikum',
+                  hintStyle: TextStyle(color: lightTextColor.withOpacity(0.7)),
                 ),
                 validator: (value) => value!.isEmpty ? 'Judul tidak boleh kosong' : null,
               ),
@@ -132,6 +137,11 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   fillColor: tealColor,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
+                // 4. Tambahkan properti hint
+                hint: Text(
+                  'Pilih Kategori',
+                  style: TextStyle(color: lightTextColor.withOpacity(0.7)),
+                ),
                 dropdownColor: tealColor,
                 items: _categories.map((String category) {
                   return DropdownMenuItem<String>(
@@ -144,6 +154,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     _selectedCategory = newValue!;
                   });
                 },
+                validator: (value) => value == null ? 'Kategori tidak boleh kosong' : null,
               ),
               const SizedBox(height: 24),
 
@@ -158,6 +169,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   fillColor: tealColor,
                   suffixIcon: Icon(Icons.calendar_today, color: lightTextColor.withOpacity(0.8)),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  hintText: 'Pilih tanggal',
+                  hintStyle: TextStyle(color: lightTextColor.withOpacity(0.7)),
                 ),
                 validator: (value) => value!.isEmpty ? 'Deadline tidak boleh kosong' : null,
               ),
@@ -168,7 +181,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 height: 150,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white54, width: 2),
+                  border: Border.all(color: Colors.grey.shade400, width: 2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Center(
